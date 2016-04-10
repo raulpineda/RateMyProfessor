@@ -1,46 +1,72 @@
 package rateMyProfessor;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.io.EOFException;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class Database {
 	
-	private List<Student> students;
-	private List<Professor> professors;
-	private List<Rating> ratings;
-	private List<User> users; 
+	private ArrayList<Student> students;
+	private ArrayList<Professor> professors;
+	private ArrayList<Rating> ratings;
+	private ArrayList<User> users;
 	
 	public Database() {
-		students = new ArrayList<Student>();
-		professors = new ArrayList<Professor>();
-		ratings = new ArrayList<Rating>();
-//		users = new ArrayList<User>();
+        this.students = new ArrayList<Student>();
+        this.professors = new ArrayList<Professor>();
 		try {
-			users = loadUsersFromFile("users.txt"); 
+			this.users = loadUsersFromFile("users.dat");
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("INFO: No users registered.");
 		}
+        try {
+            this.ratings = loadRatingsFromFile("ratings.dat");
+        } catch (Exception e) {
+            System.out.println("INFO: No ratings in the system.");
+        }
 	}
-	
-	public List<User> getUsers() {
+
+    /**
+     * Creates a new empty database
+     * @param reset true to create a new empty database
+     */
+    public Database(Boolean reset) {
+        if(reset) {
+            this.students = new ArrayList<Student>();
+            this.professors = new ArrayList<Professor>();
+            this.users = new ArrayList<User>();
+            this.ratings = new ArrayList<Rating>();
+        }
+    }
+
+    // Public methods to access the database lists
+	public ArrayList<User> getUsers() {
 		return this.users;
 	}
-	
-	public void registerStudent(Student student) throws Exception {
+	public ArrayList<Student> getStudents() {
+        return this.students;
+    }
+    public ArrayList<Professor> getProfessors() {
+        return this.professors;
+    }
+    public ArrayList<Rating> getRatings() {
+        return this.ratings;
+    }
+
+
+    // Public methods to create users
+	public void registerStudent(String email, String name, String password) throws Exception {
+        int id = generateId();
+        Student student = new Student(email, name, password, id);
 		students.add(student);
 		users.add(student);
-		// appendUserToFile("users.txt", student);
 	}
 	
-	public void registerProfessor(Professor professor) {
+	public void registerProfessor(String email, String name, String password) {
+        int id = generateId();
+        Professor professor = new Professor(email, name, password, id);
 		professors.add(professor);
 		users.add(professor);
 	}
@@ -84,64 +110,53 @@ public class Database {
 //		return (float) totalScore / scoreCount;
 //	}
 	
-	
-	
-    // steps for working with files:
-	// Create file
-	// Write each user to file
-	// Flush and close the file
-	
-	//think of how to explain it better (codewise)
-	public void saveUsersToFile(String filename) throws Exception{
-		// for each student of the class Student in the ArrayList students
+
+	public void saveUsersToFile(String filename) throws Exception {
 		FileOutputStream file = new FileOutputStream(filename);
 		ObjectOutputStream oos = new ObjectOutputStream(file);
-		for (User user : users) {
-			try {
-				oos.writeObject(user);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		oos.writeObject(getUsers());
 		oos.close();
 		file.close();
-//		for (User user : users) {
-//			// write the student to users.txt
-//			appendUserToFile(filename, user);
-//		}
 	}
-			
-// think of explanation 
-	
+
+    public void saveRatingsToFile(String filename) throws Exception {
+        FileOutputStream file = new FileOutputStream(filename);
+        ObjectOutputStream oos = new ObjectOutputStream(file);
+        oos.writeObject(getRatings());
+        oos.close();
+        file.close();
+    }
+
 	public ArrayList<User> loadUsersFromFile(String filename) throws Exception {
 		FileInputStream file = new FileInputStream(filename);
 		ObjectInputStream ois = new ObjectInputStream(file);
-		ArrayList<User> users = new ArrayList<User>();
-		boolean stop = false;
-		while(stop == false) {
-			try {
-				Object user = ois.readObject();
-				users.add((User) user);
-			} catch (EOFException e) {
-				// EOF means End Of File
-				// TODO make this prettier - EOFe are ugly
-				stop = true;
-			}
-		}
+		Object users = ois.readObject();
+        ArrayList<User> user_list = (ArrayList<User>) users;
 		ois.close();
-		return users;
+        for(User user : user_list) {
+            if(user instanceof Student) {
+                students.add((Student) user);
+            } else if(user instanceof Professor) {
+                professors.add((Professor) user);
+            }
+        }
+		return user_list;
 	}
+
+    public ArrayList<Rating> loadRatingsFromFile(String filename) throws Exception {
+        return new ArrayList<Rating>();
+    }
 
 	// the method userLogin will return a User
 	public User userLogin(String email, String password) throws Exception {
 		// we create a new empty(null) User called loggedInUser
 		User loggedInUser = null;
-		for (User user : this.users) {
+		for (User user : getUsers()) {
 			if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
 				loggedInUser = user;
 			}
 		}
-		if(loggedInUser.getEmail() != "" ) {
+		if(!loggedInUser.getEmail().equals("")) {
 			return loggedInUser;
 		} else {
 			throw new Exception("Wrong email or password");
@@ -151,32 +166,11 @@ public class Database {
 	
 	//method that give us a new id
 	public int generateId() {
-		int userCount = users.size();
-		return userCount++;
+		return getUsers().size() + 1;
 	}
-	
-	// adds a user to the end of a file
-	// TODO Ask why does this cause the file to be corrupted - we want to be able to open the file, add a user and close the file many times
-	private void appendUserToFile(String filename, User user) throws Exception {
-		// Creates a new File object with either the existing users.txt or a new one. 
-	    //note:it will exists after the first time i run my program 
-		FileOutputStream file = new FileOutputStream(filename, true);
-		ObjectOutputStream oos = new ObjectOutputStream(file);
-		
-		// Creates a new PrintWriter object that will allow us to write and save stuff
-		// into our users.txt file
-		// java.io.PrintWriter output = new java.io.PrintWriter(file);
-		
-		try {
-			oos.writeObject(user);
-		} catch (Exception e) {
-			// printStackTrace prints to System.out the last operations the computer
-			// tried to execute before the Exception happened
-			e.printStackTrace();
-		} finally {
-			// Whatever is part of the finally block will always be executed
-			oos.close();
-		}
-	}
+
+    public void saveRatingsToFile() {
+        System.out.println("Saving ratings");
+    }
 
 }
