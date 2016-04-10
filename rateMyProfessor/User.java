@@ -1,10 +1,11 @@
 package rateMyProfessor;
 import java.io.Serializable;
+import java.util.Scanner;
 
 
 public abstract class User implements Serializable {
 	
-	public User(int id, String name, String password, String email) {
+	public User(String email, String name, String password, int id) {	
 		this.id = id;
 		this.name = name;
 		this.password = password;
@@ -20,15 +21,10 @@ public abstract class User implements Serializable {
 	private String password;
 	private String email;
 
-	
 	public int getId() {
 		return id;
 	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -71,5 +67,4 @@ public abstract class User implements Serializable {
 				
 				
 	}
-
 }

@@ -2,20 +2,19 @@ package rateMyProfessor;
 
 public class Professor extends User {
 	
-	private Subject subject; // TODO convert to List<Subject>
-
-	public Professor(int id, String name, String password, Subject subject, String email) {
-		super(id, name, password, email);
-		this.subject = subject;
+	public Professor(String name, String password, String email, int id) {
+		super(name, password, email, id);
 	}
 
-	public Subject getSubject() {
-		return subject;
-	}
-
-	public void setSubject(Subject subject) {
-		this.subject = subject;
-	}
+	
+//  This is not needed, if you do it like this a professor can only have one subject
+//	public Subject getSubject() {
+//		return subject;
+//	}
+//
+//	public void setSubject(Subject subject) {
+//		this.subject = subject;
+//	}
 	
 
 }
