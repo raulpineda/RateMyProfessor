@@ -1,11 +1,11 @@
-package Final.v2;
+package rateMyProfessor;
 
 public class Professor extends User {
 	
 	private Subject subject; // TODO convert to List<Subject>
 
-	public Professor(int id, String name, String password, Subject subject) {
-		super(id, name, password);
+	public Professor(int id, String name, String password, Subject subject, String email) {
+		super(id, name, password, email);
 		this.subject = subject;
 	}
 

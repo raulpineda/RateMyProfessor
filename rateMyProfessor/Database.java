@@ -1,4 +1,4 @@
-package Final.v2;
+package rateMyProfessor;
 
 import java.util.ArrayList;
 import java.util.List;

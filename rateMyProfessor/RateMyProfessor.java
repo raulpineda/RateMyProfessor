@@ -1,4 +1,4 @@
-package Final.v2;
+package rateMyProfessor;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -9,15 +9,15 @@ public class RateMyProfessor {
 		
 		Database db = new Database();
 		
-		Student viktorija = new Student(1, "Viktorija", "123", 111); 
+		Student viktorija = new Student(1, "Viktorija", "123", 111, "viktorija@email.com"); 
 		db.registerStudent(viktorija);
 
 		
-		Student alice = new Student(2, "Alice", "123", 222); 
+		Student alice = new Student(2, "Alice", "123", 222, "alice@email.com"); 
 		db.registerStudent(alice);
 		
 		
-		Student tom = new Student(3, "Tom", "lkasjdi", 333); 
+		Student tom = new Student(3, "Tom", "lkasjdi", 333, "tom@email.com"); 
 		db.registerStudent(tom);	
 		
 		// try to save all my users to users.txt
@@ -58,8 +58,8 @@ public class RateMyProfessor {
 		// user (lower case u), human being using the program
 		
 		Scanner input = new Scanner(System.in);
-//		String systemUsername = "admin";
-//		String systemPassword = "abc123";
+		String systemUsername = "admin";
+		String systemPassword = "abc123";
 		int count = 0;
 		
 		do {
